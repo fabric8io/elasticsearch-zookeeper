@@ -36,6 +36,10 @@ public class ZooKeeperFactory extends AbstractComponent {
 
     private final String host;
 
+    private final String username;
+
+    private final String password;
+
     private final TimeValue sessionTimeout;
 
     @Inject public ZooKeeperFactory(Settings settings) {
@@ -44,6 +48,8 @@ public class ZooKeeperFactory extends AbstractComponent {
         if (host == null) {
             throw new ElasticsearchException("Empty ZooKeeper host name");
         }
+        username = componentSettings.get("username");
+        password = componentSettings.get("password");
         sessionTimeout = componentSettings.getAsTime("session.timeout", new TimeValue(1, TimeUnit.MINUTES));
     }
 
@@ -56,7 +62,11 @@ public class ZooKeeperFactory extends AbstractComponent {
 
     public ZooKeeper newZooKeeper(Watcher watcher) {
         try {
-            return new ZooKeeper(host, (int) sessionTimeout.millis(), watcher);
+            ZooKeeper zookeeper = new ZooKeeper(host, (int) sessionTimeout.millis(), watcher);
+            if (username != null && password != null) {
+              zookeeper.addAuthInfo("digest", String.format("%s:%s", username, password).getBytes());
+            }
+            return zookeeper;
         } catch (IOException e) {
             throw new ElasticsearchException("Cannot start ZooKeeper", e);
         }
