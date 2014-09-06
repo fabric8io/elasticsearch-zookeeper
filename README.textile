@@ -29,10 +29,13 @@ h3. Installation
 
 <pre>
 discovery:
-    type: com.sonian.elasticsearch.zookeeper.discovery.ZooKeeperDiscoveryModule
+    type: com.sonian.elasticsearch.zookeeper.discovery.ZooKeeper
 sonian.elasticsearch.zookeeper:
     settings.enabled: true
-    client.host: localhost:2181
+    client:
+        host: localhost:2181
+        username: admin
+        password: admin
     discovery.state_publishing.enabled: true
 </pre>
 
